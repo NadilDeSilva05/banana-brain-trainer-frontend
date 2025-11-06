@@ -1,26 +1,53 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Banana Brain Trainer Theme Colors */
+  --background: #0f1f1a;
+  --background-secondary: #1a2e27;
+  --foreground: #ffffff;
+  --foreground-secondary: #9ca3af;
+  --primary: #4ade80;
+  --primary-hover: #3bc66f;
+  --primary-dark: #16a34a;
+  --accent: #fbbf24;
+  --dark-overlay: rgba(0, 0, 0, 0.6);
+  
+  /* Gradient colors */
+  --gradient-from: #0f1f1a;
+  --gradient-to: #1a3a2e;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background: linear-gradient(to bottom, var(--gradient-from), var(--gradient-to));
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
 }
 
-body {
+/* Custom scrollbar for the theme */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-dark);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }
