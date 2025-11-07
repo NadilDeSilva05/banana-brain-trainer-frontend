@@ -2,12 +2,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBrain } from "@fortawesome/free-solid-svg-icons";
+import FloatingBananas from "../components/FloatingBananas";
+import Button from "../components/Button";
 
 export default function Home() {
   return (
-    <div className="relative flex h-screen flex-col items-center justify-between bg-linear-to-b from-[#0f1f1a] to-[#1a3a2e] px-4 py-6 sm:px-8 md:px-16">
+    <div className="relative flex h-screen flex-col items-center justify-between overflow-hidden bg-linear-to-b from-[#0f1f1a] to-[#1a3a2e] px-4 py-6 sm:px-8 md:px-16">
+      <FloatingBananas />
+
       {/* Header with Logo/Icon */}
-      <header className="w-full max-w-6xl pt-2">
+      <header className="relative z-10 w-full max-w-6xl pt-2">
         <div className="flex items-center justify-center">
         <FontAwesomeIcon icon={faBrain} className="text-primary " size="3x"/>
 
@@ -15,7 +19,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="flex w-full max-w-6xl flex-1 flex-col items-center justify-center space-y-4">
+      <main className="relative z-10 flex w-full max-w-6xl flex-1 flex-col items-center justify-center space-y-4">
         {/* Title Section */}
         <div className="space-y-1 text-center sm:space-y-2">
           <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl">
@@ -64,33 +68,36 @@ export default function Home() {
 
             {/* CTA Buttons */}
             <div className="flex w-full flex-col gap-2.5">
-              <Link 
-                href="/register"
-                className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-primary-hover hover:shadow-lg hover:shadow-primary/50 sm:px-8 sm:py-3 sm:text-base"
-              >
-                <span>Register Now</span>
-                <svg 
-                  className="h-4 w-4 transition-transform group-hover:translate-x-1" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
+              <Link href="/register">
+                <Button 
+                  variant="primary" 
+                  fullWidth
+                  icon={
+                    <svg 
+                      className="h-4 w-4" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  }
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
+                  Register Now
+                </Button>
               </Link>
-              <Link 
-                href="/login"
-                className="flex items-center justify-center gap-2 rounded-full border-2 border-white/10 bg-white/5 px-6 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:bg-white/10 sm:px-8 sm:py-3 sm:text-base"
-              >
-                Login
+              <Link href="/login">
+                <Button variant="secondary" fullWidth>
+                  Login
+                </Button>
               </Link>
             </div>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="w-full max-w-6xl space-y-3 pb-4">
+        {/* Footer */}
+        <footer className="relative z-10 w-full max-w-6xl space-y-3 pb-4">
         {/* <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400 sm:gap-8 sm:text-sm">
           <Link 
             href="/about" 
