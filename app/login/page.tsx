@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBrain, faArrowLeft, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faBrain, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import FloatingBananas from "../../components/FloatingBananas";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
+import BackButton from "../../components/BackButton";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -17,6 +20,13 @@ export default function LoginPage() {
     e.preventDefault();
     // Handle login logic here
     console.log("Login attempt:", { username, password });
+    
+    // TODO: Implement actual authentication
+    // For now, redirect to main menu after login
+    // In a real app, you'd validate credentials first
+    if (username && password) {
+      router.push("/main-menu");
+    }
   };
 
   return (
@@ -25,13 +35,7 @@ export default function LoginPage() {
 
       {/* Back Button */}
       <div className="absolute left-4 top-6 z-20 sm:left-8">
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-sm text-gray-300 transition-colors hover:text-primary"
-        >
-          <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4" />
-          <span>Back</span>
-        </Link>
+        <BackButton href="/" />
       </div>
 
       {/* Main Content */}

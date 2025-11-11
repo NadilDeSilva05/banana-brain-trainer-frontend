@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBrain, faArrowLeft, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faBrain, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import FloatingBananas from "../../components/FloatingBananas";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
+import BackButton from "../../components/BackButton";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -60,13 +61,7 @@ export default function RegisterPage() {
 
       {/* Back Button */}
       <div className="absolute left-4 top-6 z-20 sm:left-8">
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-sm text-gray-300 transition-colors hover:text-primary"
-        >
-          <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4" />
-          <span>Back</span>
-        </Link>
+        <BackButton href="/" />
       </div>
 
       {/* Main Content */}
