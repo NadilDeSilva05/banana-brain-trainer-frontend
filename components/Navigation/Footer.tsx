@@ -11,7 +11,7 @@ export default function Footer({
 }: FooterProps) {
   return (
     <footer className="relative z-10 py-6 text-center">
-      {/* {showLinks && (
+      {showLinks && (
         <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-400 mb-3">
           <Link
             href="/about"
@@ -34,7 +34,7 @@ export default function Footer({
             Privacy Policy
           </Link>
         </div>
-      )} */}
+      )}
       <div className="text-xs text-gray-500">
         © {copyrightYear} Banana Brain Trainer Game
       </div>
