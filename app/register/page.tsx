@@ -3,36 +3,62 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBrain, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
-import FloatingBananas from "../../components/FloatingBananas";
-import InputField from "../../components/InputField";
-import Button from "../../components/Button";
-import BackButton from "../../components/BackButton";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import FloatingBananas from "@/components/FloatingBananas";
+import InputField from "@/components/InputField";
+import Button from "@/components/Button";
+import BackButton from "@/components/BackButton";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { registerUser, clearError } from "@/store/slices/authSlice";
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { loading, error, isAuthenticated } = useAppSelector((state) => state.auth);
+  
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({
     username: "",
+    email: "",
     password: "",
     confirmPassword: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/main-menu");
+    }
+  }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Reset errors
-    setErrors({ username: "", password: "", confirmPassword: "" });
+    setErrors({ username: "", email: "", password: "", confirmPassword: "" });
     
     // Validation
     let hasError = false;
-    const newErrors = { username: "", password: "", confirmPassword: "" };
+    const newErrors = { username: "", email: "", password: "", confirmPassword: "" };
 
     if (username.length < 3) {
       newErrors.username = "Username must be at least 3 characters";
+      hasError = true;
+    }
+
+    if (!email || !email.includes("@")) {
+      newErrors.email = "Please enter a valid email address";
       hasError = true;
     }
 
@@ -51,8 +77,19 @@ export default function RegisterPage() {
       return;
     }
 
-    // Handle registration logic here
-    console.log("Registration attempt:", { username, password });
+    const result = await dispatch(registerUser({ username, email, password }));
+    
+    if (registerUser.fulfilled.match(result)) {
+      router.push("/main-menu");
+    } else if (registerUser.rejected.match(result)) {
+      const errorMessage = result.payload as string;
+      setErrors({ 
+        username: errorMessage.includes("username") ? errorMessage : "",
+        email: errorMessage.includes("email") ? errorMessage : "",
+        password: errorMessage.includes("password") ? errorMessage : "",
+        confirmPassword: "",
+      });
+    }
   };
 
   return (
@@ -97,6 +134,19 @@ export default function RegisterPage() {
                 placeholder="Choose a username"
                 autoComplete="off"
                 error={errors.username}
+                required
+              />
+
+              {/* Email Field */}
+              <InputField
+                label="Email"
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                autoComplete="email"
+                error={errors.email}
                 required
               />
 
@@ -153,8 +203,8 @@ export default function RegisterPage() {
               />
 
               {/* Create Account Button */}
-              <Button type="submit" variant="primary" fullWidth>
-                Create Account
+              <Button type="submit" variant="primary" fullWidth disabled={loading}>
+                {loading ? "Creating Account..." : "Create Account"}
               </Button>
             </form>
           </div>

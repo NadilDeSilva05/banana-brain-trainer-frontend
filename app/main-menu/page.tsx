@@ -8,23 +8,36 @@ import {
   faChartBar,
   faGear,
 } from "@fortawesome/free-solid-svg-icons";
-import FloatingBananas from "../../components/FloatingBananas";
-import Navigation from "../../components/Navigation";
+import FloatingBananas from "@/components/FloatingBananas";
+import Navigation from "@/components/Navigation";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { logout } from "@/store/slices/authSlice";
+import { useEffect } from "react";
 
 export default function MainMenuPage() {
   const router = useRouter();
-  const [username] = useState("nadil"); // Default username, can be fetched from auth context
+  const dispatch = useAppDispatch();
+  const { user, loading, isAuthenticated } = useAppSelector((state) => state.auth);
 
-  // TODO: Fetch username from auth context/session
-  // In a real app, you'd fetch the username from your auth context or session
-  // For now, using default "nadil" as shown in the image
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [loading, isAuthenticated, router]);
 
   const handleLogout = () => {
-    // TODO: Implement logout logic
+    dispatch(logout());
     router.push("/login");
   };
+
+  if (loading || !user) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-linear-to-b from-[#0f1f1a] to-[#1a3a2e]">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   const menuItems = [
     {
@@ -59,7 +72,7 @@ export default function MainMenuPage() {
 
   return (
     <Navigation
-      username={username}
+      username={user.username}
       showUserInfo={true}
       onLogout={handleLogout}
       showFooterLinks={false}
@@ -81,7 +94,7 @@ export default function MainMenuPage() {
               Welcome back,
             </p>
             <p className="text-xl font-bold text-white">
-              {username}!
+              {user.username}!
             </p>
           </div>
 
