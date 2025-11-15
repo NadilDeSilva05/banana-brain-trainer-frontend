@@ -3,40 +3,71 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrophy, faHome } from "@fortawesome/free-solid-svg-icons";
-import FloatingBananas from "../../components/FloatingBananas";
-import Navigation from "../../components/Navigation";
-import { useState } from "react";
+import FloatingBananas from "@/components/FloatingBananas";
+import Navigation from "@/components/Navigation";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-interface LeaderboardEntry {
-  rank: number;
-  username: string;
-  level: number;
-  score: number;
-}
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { logout } from "@/store/slices/authSlice";
+import { leaderboardService } from "@/services/leaderboardService";
+import { LeaderboardEntry } from "@/types/api";
 
 export default function LeaderboardPage() {
   const router = useRouter();
-  const [username] = useState("nadil"); // TODO: Fetch from auth context
+  const dispatch = useAppDispatch();
+  const { user, loading: authLoading, isAuthenticated } = useAppSelector((state) => state.auth);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [authLoading, isAuthenticated, router]);
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        setLoading(true);
+        const response = await leaderboardService.getLeaderboard(10);
+        
+        if (response.success && response.data) {
+          // Transform API response to match component expectations
+          const transformed = response.data.leaderboard.map((entry, index) => ({
+            ...entry,
+            rank: index + 1,
+            level: Math.floor(entry.highestScore / 250) + 1, // Calculate level from score
+            score: entry.highestScore,
+          }));
+          setLeaderboardData(transformed);
+        } else {
+          setError(response.error || "Failed to load leaderboard");
+        }
+      } catch (err) {
+        setError("An error occurred while loading the leaderboard");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchLeaderboard();
+    }
+  }, [isAuthenticated]);
 
   const handleLogout = () => {
-    // TODO: Implement logout logic
+    dispatch(logout());
     router.push("/login");
   };
 
-  // Sample leaderboard data - in a real app, this would come from an API
-  const leaderboardData: LeaderboardEntry[] = [
-    { rank: 1, username: "nadil", level: 5, score: 1250 },
-    { rank: 2, username: "player2", level: 4, score: 980 },
-    { rank: 3, username: "player3", level: 4, score: 850 },
-    { rank: 4, username: "player4", level: 3, score: 720 },
-    { rank: 5, username: "player5", level: 3, score: 650 },
-    { rank: 6, username: "player6", level: 2, score: 540 },
-    { rank: 7, username: "player7", level: 2, score: 480 },
-    { rank: 8, username: "player8", level: 2, score: 420 },
-    { rank: 9, username: "player9", level: 1, score: 350 },
-    { rank: 10, username: "player10", level: 1, score: 280 },
-  ];
+  if (authLoading || !user) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#1A2B27]">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   const getTrophyIcon = (rank: number) => {
     switch (rank) {
@@ -53,7 +84,7 @@ export default function LeaderboardPage() {
 
   return (
     <Navigation
-      username={username}
+      username={user.username}
       showUserInfo={true}
       onLogout={handleLogout}
       showFooterLinks={true}
@@ -71,9 +102,27 @@ export default function LeaderboardPage() {
             <p className="text-white text-sm sm:text-base">See who&apos;s top banana!</p>
           </div>
 
-          {/* Scrollable Leaderboard Entries */}
-          <div className="flex-1 overflow-y-auto pr-2 space-y-3 mb-4">
-            {leaderboardData.map((entry) => {
+          {/* Error Message */}
+          {error && (
+            <div className="rounded-lg bg-red-500/20 border border-red-500/50 p-3 text-sm text-red-300 mb-4">
+              {error}
+            </div>
+          )}
+
+          {/* Loading State */}
+          {loading ? (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-white">Loading leaderboard...</div>
+            </div>
+          ) : (
+            /* Scrollable Leaderboard Entries */
+            <div className="flex-1 overflow-y-auto pr-2 space-y-3 mb-4">
+              {leaderboardData.length === 0 ? (
+                <div className="text-center text-gray-400 py-8">
+                  No leaderboard data available yet. Be the first to play!
+                </div>
+              ) : (
+                leaderboardData.map((entry) => {
               const trophy = getTrophyIcon(entry.rank);
               return (
                 <div
@@ -110,8 +159,9 @@ export default function LeaderboardPage() {
                   </div>
                 </div>
               );
-            })}
-          </div>
+            }))}
+            </div>
+          )}
 
           {/* Back to Home Button */}
           <div className="flex justify-center pt-2 shrink-0">

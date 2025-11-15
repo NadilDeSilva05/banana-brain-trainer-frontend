@@ -3,28 +3,46 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBrain, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import FloatingBananas from "../../components/FloatingBananas";
-import InputField from "../../components/InputField";
-import Button from "../../components/Button";
-import BackButton from "../../components/BackButton";
+import FloatingBananas from "@/components/FloatingBananas";
+import InputField from "@/components/InputField";
+import Button from "@/components/Button";
+import BackButton from "@/components/BackButton";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { loginUser, clearError } from "@/store/slices/authSlice";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const dispatch = useAppDispatch();
+  const { loading, error, isAuthenticated } = useAppSelector((state) => state.auth);
+  
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/main-menu");
+    }
+  }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { username, password });
+
+    if (!email || !password) {
+      return;
+    }
+
+    const result = await dispatch(loginUser({ email, password }));
     
-    // TODO: Implement actual authentication
-    // For now, redirect to main menu after login
-    // In a real app, you'd validate credentials first
-    if (username && password) {
+    if (loginUser.fulfilled.match(result)) {
       router.push("/main-menu");
     }
   };
@@ -61,15 +79,22 @@ export default function LoginPage() {
           {/* Login Form */}
           <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-sm sm:p-8">
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Username Field */}
+              {/* Error Message */}
+              {error && (
+                <div className="rounded-lg bg-red-500/20 border border-red-500/50 p-3 text-sm text-red-300">
+                  {error}
+                </div>
+              )}
+
+              {/* Email Field */}
               <InputField
-                label="Username"
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
-                autoComplete="off"
+                label="Email"
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                autoComplete="email"
                 required
               />
 
@@ -99,8 +124,8 @@ export default function LoginPage() {
               />
 
               {/* Login Button */}
-              <Button type="submit" variant="primary" fullWidth>
-                Login
+              <Button type="submit" variant="primary" fullWidth disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
               </Button>
             </form>
           </div>

@@ -8,24 +8,36 @@ import {
   faClock,
   faBars,
 } from "@fortawesome/free-solid-svg-icons";
-import FloatingBananas from "../../../components/FloatingBananas";
-import BackButton from "../../../components/BackButton";
-import GameModal from "../../../components/GameModal";
+import FloatingBananas from "@/components/FloatingBananas";
+import BackButton from "@/components/BackButton";
+import GameModal from "@/components/GameModal";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { logout } from "@/store/slices/authSlice";
+import { gameService } from "@/services/gameService";
 
 export default function NewGamePage() {
   const router = useRouter();
-  const [username] = useState("nadil"); // TODO: Fetch from auth context
+  const dispatch = useAppDispatch();
+  const { user, loading: authLoading, isAuthenticated } = useAppSelector((state) => state.auth);
   const [score, setScore] = useState(0);
+  const [level, setLevel] = useState(1);
   const [streak, setStreak] = useState(0);
   const [timer, setTimer] = useState(30);
+  const [startTime] = useState(() => Date.now());
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showBackModal, setShowBackModal] = useState(false);
   
   // Sample answers - in a real app, these would come from the API
   const answers = [5, 7, 9, 12];
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   // Timer countdown
   useEffect(() => {
@@ -37,14 +49,43 @@ export default function NewGamePage() {
     }
   }, [timer]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (selectedAnswer === null) return;
     
-    // TODO: Implement answer submission logic
-    console.log("Answer submitted:", selectedAnswer);
+    // Update score based on correct answer (simplified - in real app, check if answer is correct)
+    const isCorrect = true; // Placeholder - implement actual answer checking
+    if (isCorrect) {
+      setScore(prev => prev + 10);
+      setStreak(prev => prev + 1);
+      if (streak + 1 >= 5) {
+        setLevel(prev => prev + 1);
+      }
+    } else {
+      setStreak(0);
+    }
+    
     // Reset answer and timer for next question
     setSelectedAnswer(null);
     setTimer(30);
+  };
+
+  const saveGameSession = async () => {
+    if (!user) return;
+
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+    
+    try {
+      await gameService.createSession({
+        user: user.id,
+        score,
+        level,
+        timeSpent,
+        gameType: 'mixed',
+        completed: true,
+      });
+    } catch (error) {
+      console.error('Failed to save game session:', error);
+    }
   };
 
   const handleAnswerSelect = (value: number) => {
@@ -69,19 +110,23 @@ export default function NewGamePage() {
     router.push("/game/new");
   };
 
-  const handleMainMenu = () => {
+  const handleMainMenu = async () => {
     setShowBackModal(false);
+    await saveGameSession();
     router.push("/main-menu");
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setShowBackModal(false);
+    await saveGameSession();
+    dispatch(logout());
     router.push("/login");
   };
 
-  const handleQuit = () => {
+  const handleQuit = async () => {
     setShowBackModal(false);
-    // In a real app, you might want to show a confirmation or save progress
+    // Save game session before quitting
+    await saveGameSession();
     router.push("/main-menu");
   };
 
@@ -97,6 +142,13 @@ export default function NewGamePage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showMenu]);
 
+  if (authLoading || !user) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#1A2B27]">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex h-screen flex-col overflow-hidden bg-[#1A2B27]">
@@ -121,10 +173,10 @@ export default function NewGamePage() {
         <div className="relative menu-container flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#4CAF50]">
             <span className="text-white font-bold text-lg">
-              {username.charAt(0).toUpperCase()}
+              {user?.username.charAt(0).toUpperCase() || 'U'}
             </span>
           </div>
-          <span className="text-white font-medium text-sm">{username}</span>
+          <span className="text-white font-medium text-sm">{user?.username || 'User'}</span>
           <button
             onClick={handleMenuToggle}
             className="text-white transition-colors hover:text-[#4CAF50] p-2"
@@ -156,6 +208,7 @@ export default function NewGamePage() {
               </button>
               <button
                 onClick={() => {
+                  dispatch(logout());
                   router.push("/login");
                   setShowMenu(false);
                 }}
