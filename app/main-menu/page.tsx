@@ -13,12 +13,12 @@ import LogoutConfirmationModal from "@/components/LogoutConfirmationModal";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/slices/authSlice";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function MainMenuPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { user, loading, isAuthenticated } = useAppSelector((state) => state.auth);
+  const { user, loading } = useAppSelector((state) => state.auth);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogoutClick = () => {
@@ -29,6 +29,7 @@ export default function MainMenuPage() {
     dispatch(logout());
     router.push("/login");
   };
+
   const handleLogoutCancel = () => {
     setShowLogoutModal(false);
   };

@@ -42,7 +42,7 @@ export default function LeaderboardPage() {
         
         if (response.success && response.data) {
           // Transform API response to match component expectations
-          const transformed = response.data.leaderboard.map((entry, index) => ({
+          const transformed = response.data.leaderboard.map((entry: { username: string; highestScore: number }, index: number) => ({
             ...entry,
             rank: index + 1,
             level: Math.floor(entry.highestScore / 250) + 1, // Calculate level from score
@@ -52,7 +52,7 @@ export default function LeaderboardPage() {
         } else {
           setError(response.error || "Failed to load leaderboard");
         }
-      } catch (err) {
+      } catch {
         setError("An error occurred while loading the leaderboard");
       } finally {
         setLoading(false);
@@ -199,7 +199,7 @@ export default function LeaderboardPage() {
               );
                 })
               )}
-            </div>
+          </div>
           )}
 
           {/* Back to Home Button */}

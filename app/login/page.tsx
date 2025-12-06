@@ -11,22 +11,38 @@ import BackButton from "@/components/BackButton";
 import MusicToggle from "@/components/MusicToggle";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { loginUser, clearError } from "@/store/slices/authSlice";
+import { useEffect } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/main-menu");
+    }
+  }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { username, password });
     
-    // TODO: Implement actual authentication
-    // For now, redirect to main menu after login
-    // In a real app, you'd validate credentials first
-    if (username && password) {
+    if (!username || !password) {
+      return;
+    }
+
+    const result = await dispatch(loginUser({ username, password }));
+    
+    if (loginUser.fulfilled.match(result)) {
       router.push("/main-menu");
     }
   };

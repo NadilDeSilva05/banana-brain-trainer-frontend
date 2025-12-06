@@ -15,7 +15,7 @@ import { registerUser, clearError } from "@/store/slices/authSlice";
 export default function RegisterPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { loading, isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
