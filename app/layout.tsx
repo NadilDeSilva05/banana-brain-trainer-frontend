@@ -3,6 +3,11 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
+<<<<<<< Updated upstream
+=======
+import ReduxProvider from '@/providers/ReduxProvider'
+import MusicProvider from '@/providers/MusicProvider'
+>>>>>>> Stashed changes
 config.autoAddCss = false
 
 
@@ -31,7 +36,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+<<<<<<< Updated upstream
         {children}
+=======
+        <ReduxProvider>
+          <MusicProvider>
+            {children}
+          </MusicProvider>
+        </ReduxProvider>
+>>>>>>> Stashed changes
       </body>
     </html>
   );

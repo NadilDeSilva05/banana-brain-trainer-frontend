@@ -5,10 +5,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBrain, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+<<<<<<< Updated upstream
 import FloatingBananas from "../../components/FloatingBananas";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import BackButton from "../../components/BackButton";
+=======
+import InputField from "@/components/InputField";
+import Button from "@/components/Button";
+import BackButton from "@/components/BackButton";
+import MusicToggle from "@/components/MusicToggle";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { loginUser, clearError } from "@/store/slices/authSlice";
+>>>>>>> Stashed changes
 
 export default function LoginPage() {
   const router = useRouter();
@@ -30,8 +39,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex h-screen flex-col overflow-hidden bg-linear-to-b from-[#0f1f1a] to-[#1a3a2e] px-4 py-6">
-      <FloatingBananas />
+    <div 
+      className="relative flex h-screen flex-col overflow-hidden px-4 py-6"
+      style={{
+        backgroundImage: "url('/assets/images/background-image.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <MusicToggle position="top-right" />
 
       {/* Back Button */}
       <div className="absolute left-4 top-6 z-20 sm:left-8">
@@ -42,14 +59,14 @@ export default function LoginPage() {
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center">
         <div className="w-full max-w-md space-y-6">
           {/* Brain Icon */}
-          <div className="flex justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary">
+          <div className="flex justify-center animate-scale-in-bounce">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary animate-pulse">
               <FontAwesomeIcon icon={faBrain} className="text-white" size="2x" />
             </div>
           </div>
 
           {/* Welcome Text */}
-          <div className="space-y-2 text-center">
+          <div className="space-y-2 text-center animate-slide-in-up animate-delay-200">
             <h1 className="text-2xl font-bold text-white sm:text-3xl">
               Welcome Back!
             </h1>
@@ -59,7 +76,7 @@ export default function LoginPage() {
           </div>
 
           {/* Login Form */}
-          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-sm sm:p-8">
+          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-sm sm:p-8 animate-scale-in animate-delay-300">
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Username Field */}
               <InputField
