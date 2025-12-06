@@ -15,6 +15,7 @@ export const API_URL = {
   
   // Game endpoints
   GAME: {
+    PUZZLE: '/game/puzzle',
     SESSION: '/game/session',
     SESSIONS: '/game/sessions',
     STATS: '/game/stats',

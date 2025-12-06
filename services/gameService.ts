@@ -7,7 +7,21 @@ import { httpPost, httpGet, ApiResponse } from '@/utils/httpRequest';
 import { API_URL } from '@/config/apiUrl';
 import { GameSession, GameStats, PaginationInfo } from '@/types/api';
 
+export interface PuzzleResponse {
+  image: string;
+  solution: number;
+}
+
 export const gameService = {
+  /**
+   * Get a new puzzle from Banana API
+   */
+  getPuzzle: async (base64: boolean = true): Promise<ApiResponse<PuzzleResponse>> => {
+    return httpGet<PuzzleResponse>(
+      `${API_URL.GAME.PUZZLE}?base64=${base64 ? 'yes' : 'no'}`
+    );
+  },
+
   /**
    * Create a new game session
    */

@@ -2,18 +2,24 @@ import Link from "next/link";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBrain } from "@fortawesome/free-solid-svg-icons";
-import FloatingBananas from "@/components/FloatingBananas";
 import Button from "@/components/Button";
 
 export default function Home() {
   return (
-    <div className="relative flex h-screen flex-col items-center justify-between overflow-hidden bg-linear-to-b from-[#0f1f1a] to-[#1a3a2e] px-4 py-6 sm:px-8 md:px-16">
-      <FloatingBananas />
+    <div 
+      className="relative flex h-screen flex-col items-center justify-between overflow-hidden px-4 py-6 sm:px-8 md:px-16"
+      style={{
+        backgroundImage: "url('/assets/images/background-image.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
 
       {/* Header with Logo/Icon */}
-      <header className="relative z-10 w-full max-w-6xl pt-2">
+      <header className="relative z-10 w-full max-w-6xl pt-2 animate-slide-in-down">
         <div className="flex items-center justify-center">
-        <FontAwesomeIcon icon={faBrain} className="text-primary " size="3x"/>
+        <FontAwesomeIcon icon={faBrain} className="text-primary animate-pulse" size="3x"/>
 
         </div>
       </header>
@@ -21,7 +27,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="relative z-10 flex w-full max-w-6xl flex-1 flex-col items-center justify-center space-y-4">
         {/* Title Section */}
-        <div className="space-y-1 text-center sm:space-y-2">
+        <div className="space-y-1 text-center sm:space-y-2 animate-slide-in-up" style={{ animationDelay: '0.2s' }}>
           <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl">
             Banana Brain Trainer Game
           </h1>
@@ -36,17 +42,17 @@ export default function Home() {
         {/* Hero Section with Image and CTA */}
         <div className="flex w-full flex-col items-center justify-center gap-6 md:flex-row md:items-center md:gap-8 lg:gap-12">
           {/* Hero Image Section - Left */}
-          <div className="relative w-full max-w-md md:w-1/2">
-            <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-black/40 to-black/60 p-4 shadow-2xl backdrop-blur-sm sm:p-6">
+          <div className="relative w-full max-w-md md:w-1/2 animate-slide-in-left" style={{ animationDelay: '0.3s' }}>
+            <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-black/40 to-black/60 p-4 shadow-2xl backdrop-blur-sm sm:p-6 animate-card-lift">
               <div className="absolute inset-0 bg-linear-to-t from-primary/10 to-transparent"></div>
               <div className="relative flex items-center justify-center">
                 <div className="relative h-56 w-56 sm:h-64 sm:w-64 md:h-72 md:w-72">
-                  <div className="absolute inset-0 rounded-full bg-linear-to-br from-primary/20 to-transparent blur-3xl"></div>
+                  <div className="absolute inset-0 rounded-full bg-linear-to-br from-primary/20 to-transparent blur-3xl animate-pulse"></div>
                   <Image
                     src="/assets/images/welcome-screen/WelcomeImage.png"
                     alt="Brain on Banana - Welcome to Brain Trainer"
                     fill
-                    className="object-contain drop-shadow-2xl"
+                    className="object-contain drop-shadow-2xl animate-scale-in"
                     priority
                   />
                 </div>
@@ -55,7 +61,7 @@ export default function Home() {
           </div>
 
           {/* CTA Section - Right */}
-          <div className="flex w-full max-w-sm flex-col space-y-4 md:w-1/2">
+          <div className="flex w-full max-w-sm flex-col space-y-4 md:w-1/2 animate-slide-in-right" style={{ animationDelay: '0.4s' }}>
             {/* Instructions Text */}
             <div className="space-y-2 text-center md:text-left">
               <h2 className="text-lg font-semibold text-white sm:text-xl">
@@ -97,7 +103,7 @@ export default function Home() {
       </main>
 
         {/* Footer */}
-        <footer className="relative z-10 w-full max-w-6xl space-y-3 pb-4">
+        <footer className="relative z-10 w-full max-w-6xl space-y-3 pb-4 animate-fade-in" style={{ animationDelay: '0.5s' }}>
         {/* <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400 sm:gap-8 sm:text-sm">
           <Link 
             href="/about" 
