@@ -15,7 +15,7 @@ import { registerUser, clearError } from "@/store/slices/authSlice";
 export default function RegisterPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { loading, error, isAuthenticated } = useAppSelector((state) => state.auth);
+  const { loading, isAuthenticated } = useAppSelector((state) => state.auth);
   
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -45,39 +45,48 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Trim all inputs
+    const trimmedUsername = username.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+    
     // Reset errors
     setErrors({ username: "", email: "", password: "", confirmPassword: "" });
     
     // Validation
-    let hasError = false;
     const newErrors = { username: "", email: "", password: "", confirmPassword: "" };
 
-    if (username.length < 3) {
+    if (trimmedUsername.length < 3) {
       newErrors.username = "Username must be at least 3 characters";
-      hasError = true;
     }
 
-    if (!email || !email.includes("@")) {
+    if (!trimmedEmail || !trimmedEmail.includes("@")) {
       newErrors.email = "Please enter a valid email address";
-      hasError = true;
     }
 
     if (password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
-      hasError = true;
     }
 
     if (password !== confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
-      hasError = true;
     }
+
+    const hasError = Object.values(newErrors).some((error) => error !== "");
 
     if (hasError) {
       setErrors(newErrors);
       return;
     }
 
-    const result = await dispatch(registerUser({ username, email, password }));
+    // Update state with trimmed values
+    setUsername(trimmedUsername);
+    setEmail(trimmedEmail);
+
+    const result = await dispatch(registerUser({ 
+      username: trimmedUsername, 
+      email: trimmedEmail, 
+      password 
+    }));
     
     if (registerUser.fulfilled.match(result)) {
       router.push("/main-menu");
