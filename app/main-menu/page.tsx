@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faPlay,
   faPlus,
   faChartBar,
   faGear,
@@ -40,13 +39,6 @@ export default function MainMenuPage() {
   }
 
   const menuItems = [
-    {
-      id: "continue",
-      icon: faPlay,
-      title: "Continue",
-      description: "Pick up where you left off.",
-      href: "/game",
-    },
     {
       id: "new-game",
       icon: faPlus,
