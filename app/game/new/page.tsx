@@ -107,6 +107,7 @@ export default function NewGamePage() {
     // Start at 30 seconds, decrease by 2 seconds per level, minimum 10 seconds
     return Math.max(10, 30 - (currentLevel - 1) * 2);
   };
+
   // Calculate questions per level (increases as level increases)
   const getQuestionsForLevel = (currentLevel: number): number => {
     // Start with 5 questions, increase by 2 per level
