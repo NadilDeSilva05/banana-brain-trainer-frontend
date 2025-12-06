@@ -3,15 +3,6 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBrain, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-<<<<<<< Updated upstream
-import { useState } from "react";
-import FloatingBananas from "../../components/FloatingBananas";
-import InputField from "../../components/InputField";
-import Button from "../../components/Button";
-import BackButton from "../../components/BackButton";
-
-export default function RegisterPage() {
-=======
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import InputField from "@/components/InputField";
@@ -26,21 +17,19 @@ export default function RegisterPage() {
   const dispatch = useAppDispatch();
   const { loading, isAuthenticated } = useAppSelector((state) => state.auth);
   
->>>>>>> Stashed changes
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({
     username: "",
+    email: "",
     password: "",
     confirmPassword: "",
   });
 
-<<<<<<< Updated upstream
-  const handleSubmit = (e: React.FormEvent) => {
-=======
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/main-menu");
@@ -142,7 +131,6 @@ export default function RegisterPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
->>>>>>> Stashed changes
     e.preventDefault();
     
     // Trim all inputs
@@ -150,19 +138,13 @@ export default function RegisterPage() {
     const trimmedEmail = email.trim().toLowerCase();
     
     // Reset errors
-    setErrors({ username: "", password: "", confirmPassword: "" });
+    setErrors({ username: "", email: "", password: "", confirmPassword: "" });
     
-<<<<<<< Updated upstream
-    // Validation
-    let hasError = false;
-    const newErrors = { username: "", password: "", confirmPassword: "" };
-=======
     // Validate all fields
     const usernameError = validateUsername(trimmedUsername);
     const emailError = validateEmail(trimmedEmail);
     const passwordError = validatePassword(password);
     const confirmPasswordError = validateConfirmPassword(confirmPassword, password);
->>>>>>> Stashed changes
 
     const newErrors = {
       username: usernameError,
@@ -171,29 +153,13 @@ export default function RegisterPage() {
       confirmPassword: confirmPasswordError,
     };
 
-<<<<<<< Updated upstream
-    if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-      hasError = true;
-    }
-
-    if (password !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-      hasError = true;
-    }
-=======
     const hasError = Object.values(newErrors).some((error) => error !== "");
->>>>>>> Stashed changes
 
     if (hasError) {
       setErrors(newErrors);
       return;
     }
 
-<<<<<<< Updated upstream
-    // Handle registration logic here
-    console.log("Registration attempt:", { username, password });
-=======
     // Update state with trimmed values
     setUsername(trimmedUsername);
     setEmail(trimmedEmail);
@@ -230,7 +196,6 @@ export default function RegisterPage() {
         setErrors((prev) => ({ ...prev, username: errorMessage }));
       }
     }
->>>>>>> Stashed changes
   };
 
   return (
@@ -293,8 +258,6 @@ export default function RegisterPage() {
                 required
               />
 
-<<<<<<< Updated upstream
-=======
               {/* Email Field */}
               <InputField
                 label="Email"
@@ -315,7 +278,6 @@ export default function RegisterPage() {
                 required
               />
 
->>>>>>> Stashed changes
               {/* Password Field */}
               <div className="space-y-2">
                 <InputField

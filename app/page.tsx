@@ -4,13 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBrain } from "@fortawesome/free-solid-svg-icons";
-<<<<<<< Updated upstream
-import FloatingBananas from "../components/FloatingBananas";
-import Button from "../components/Button";
-=======
 import Button from "@/components/Button";
 import MusicToggle from "@/components/MusicToggle";
->>>>>>> Stashed changes
 
 export default function Home() {
   return (

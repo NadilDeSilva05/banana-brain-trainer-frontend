@@ -5,19 +5,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBrain, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-<<<<<<< Updated upstream
-import FloatingBananas from "../../components/FloatingBananas";
-import InputField from "../../components/InputField";
-import Button from "../../components/Button";
-import BackButton from "../../components/BackButton";
-=======
 import InputField from "@/components/InputField";
 import Button from "@/components/Button";
 import BackButton from "@/components/BackButton";
 import MusicToggle from "@/components/MusicToggle";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { loginUser, clearError } from "@/store/slices/authSlice";
->>>>>>> Stashed changes
 
 export default function LoginPage() {
   const router = useRouter();

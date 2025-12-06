@@ -8,13 +8,6 @@ import {
   faClock,
   faBars,
 } from "@fortawesome/free-solid-svg-icons";
-<<<<<<< Updated upstream
-import FloatingBananas from "../../../components/FloatingBananas";
-import BackButton from "../../../components/BackButton";
-import GameModal from "../../../components/GameModal";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-=======
 import BackButton from "@/components/BackButton";
 import GameModal from "@/components/GameModal";
 import GameOverModal from "@/components/GameOverModal";
@@ -26,11 +19,13 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/slices/authSlice";
 import { gameService, Puzzle } from "@/services/gameService";
 import { leaderboardService } from "@/services/leaderboardService";
->>>>>>> Stashed changes
 
 export default function NewGamePage() {
   const router = useRouter();
-  const [username] = useState("nadil"); // TODO: Fetch from auth context
+  const dispatch = useAppDispatch();
+  const { user, loading: authLoading, isAuthenticated } = useAppSelector((state) => state.auth);
+  const [level, setLevel] = useState(1);
+  const [startTime] = useState(Date.now());
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
@@ -51,28 +46,6 @@ export default function NewGamePage() {
   const [error, setError] = useState<string | null>(null);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-<<<<<<< Updated upstream
-  // Timer countdown
-  useEffect(() => {
-    if (timer > 0) {
-      const interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [timer]);
-
-  const handleSubmit = () => {
-    if (selectedAnswer === null) return;
-    
-    // TODO: Implement answer submission logic
-    console.log("Answer submitted:", selectedAnswer);
-    // Reset answer and timer for next question
-    setSelectedAnswer(null);
-    setTimer(30);
-  };
-
-=======
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push("/login");
@@ -97,7 +70,6 @@ export default function NewGamePage() {
     const answersArray = Array.from(answersSet);
     return answersArray.sort(() => Math.random() - 0.5);
   };
-
   // Fetch new puzzle from Banana API
   const fetchPuzzle = useCallback(async () => {
     setLoading(true);
@@ -271,8 +243,6 @@ export default function NewGamePage() {
     }
   };
 
-
->>>>>>> Stashed changes
   const handleAnswerSelect = (value: number) => {
     // Don't allow answer selection when modal is open
     if (showBackModal || showGameOver) return;
@@ -338,17 +308,6 @@ export default function NewGamePage() {
     router.push("/main-menu");
   };
 
-<<<<<<< Updated upstream
-  const handleLogout = () => {
-    setShowBackModal(false);
-    router.push("/login");
-  };
-
-  const handleQuit = () => {
-    setShowBackModal(false);
-    // In a real app, you might want to show a confirmation or save progress
-    router.push("/main-menu");
-=======
   const handleLogoutClick = () => {
     setShowBackModal(false);
     setShowLogoutModal(true);
@@ -363,7 +322,6 @@ export default function NewGamePage() {
 
   const handleLogoutCancel = () => {
     setShowLogoutModal(false);
->>>>>>> Stashed changes
   };
 
 
@@ -379,8 +337,6 @@ export default function NewGamePage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showMenu]);
 
-<<<<<<< Updated upstream
-=======
   if (authLoading || !user) {
     return (
       <div 
@@ -396,7 +352,8 @@ export default function NewGamePage() {
       </div>
     );
   }
->>>>>>> Stashed changes
+
+  const username = user.username;
 
   return (
     <div 
@@ -464,10 +421,6 @@ export default function NewGamePage() {
               </button>
               <button
                 onClick={() => {
-<<<<<<< Updated upstream
-                  router.push("/login");
-=======
->>>>>>> Stashed changes
                   setShowMenu(false);
                   setShowLogoutModal(true);
                 }}

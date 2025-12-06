@@ -3,16 +3,14 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrophy, faHome } from "@fortawesome/free-solid-svg-icons";
-<<<<<<< Updated upstream
-import FloatingBananas from "../../components/FloatingBananas";
-import Navigation from "../../components/Navigation";
-import { useState } from "react";
-=======
 import Navigation from "@/components/Navigation";
 import MusicToggle from "@/components/MusicToggle";
+import LogoutConfirmationModal from "@/components/LogoutConfirmationModal";
 import { useState, useEffect } from "react";
->>>>>>> Stashed changes
 import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { logout } from "@/store/slices/authSlice";
+import { leaderboardService } from "@/services/leaderboardService";
 
 interface LeaderboardEntry {
   rank: number;
@@ -23,28 +21,6 @@ interface LeaderboardEntry {
 
 export default function LeaderboardPage() {
   const router = useRouter();
-<<<<<<< Updated upstream
-  const [username] = useState("nadil"); // TODO: Fetch from auth context
-
-  const handleLogout = () => {
-    // TODO: Implement logout logic
-    router.push("/login");
-  };
-
-  // Sample leaderboard data - in a real app, this would come from an API
-  const leaderboardData: LeaderboardEntry[] = [
-    { rank: 1, username: "nadil", level: 5, score: 1250 },
-    { rank: 2, username: "player2", level: 4, score: 980 },
-    { rank: 3, username: "player3", level: 4, score: 850 },
-    { rank: 4, username: "player4", level: 3, score: 720 },
-    { rank: 5, username: "player5", level: 3, score: 650 },
-    { rank: 6, username: "player6", level: 2, score: 540 },
-    { rank: 7, username: "player7", level: 2, score: 480 },
-    { rank: 8, username: "player8", level: 2, score: 420 },
-    { rank: 9, username: "player9", level: 1, score: 350 },
-    { rank: 10, username: "player10", level: 1, score: 280 },
-  ];
-=======
   const dispatch = useAppDispatch();
   const { user, loading: authLoading, isAuthenticated } = useAppSelector((state) => state.auth);
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
@@ -116,7 +92,8 @@ export default function LeaderboardPage() {
       </div>
     );
   }
->>>>>>> Stashed changes
+
+  const username = user.username;
 
   const getTrophyIcon = (rank: number) => {
     switch (rank) {
@@ -161,11 +138,6 @@ export default function LeaderboardPage() {
             <p className="text-white text-sm sm:text-base">See who&apos;s top banana!</p>
           </div>
 
-<<<<<<< Updated upstream
-          {/* Scrollable Leaderboard Entries */}
-          <div className="flex-1 overflow-y-auto pr-2 space-y-3 mb-4">
-            {leaderboardData.map((entry) => {
-=======
           {/* Error Message */}
           {error && (
             <div className="rounded-lg bg-red-500/20 border border-red-500/50 p-3 text-sm text-red-300 mb-4">
@@ -187,7 +159,6 @@ export default function LeaderboardPage() {
                 </div>
               ) : (
                 leaderboardData.map((entry, index) => {
->>>>>>> Stashed changes
               const trophy = getTrophyIcon(entry.rank);
               const animationDelay = `${100 + Math.min(index, 5) * 50}ms`;
               return (
@@ -226,8 +197,10 @@ export default function LeaderboardPage() {
                   </div>
                 </div>
               );
-            })}
-          </div>
+                })
+              )}
+            </div>
+          )}
 
           {/* Back to Home Button */}
           <div className="flex justify-center pt-2 shrink-0 animate-slide-in-up animate-delay-500">

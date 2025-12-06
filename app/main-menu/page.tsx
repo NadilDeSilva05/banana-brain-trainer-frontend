@@ -7,16 +7,6 @@ import {
   faChartBar,
   faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
-<<<<<<< Updated upstream
-import FloatingBananas from "../../components/FloatingBananas";
-import Navigation from "../../components/Navigation";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-
-export default function MainMenuPage() {
-  const router = useRouter();
-  const [username] = useState("nadil"); // Default username, can be fetched from auth context
-=======
 import Navigation from "@/components/Navigation";
 import MusicToggle from "@/components/MusicToggle";
 import LogoutConfirmationModal from "@/components/LogoutConfirmationModal";
@@ -30,27 +20,7 @@ export default function MainMenuPage() {
   const dispatch = useAppDispatch();
   const { user, loading, isAuthenticated } = useAppSelector((state) => state.auth);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
->>>>>>> Stashed changes
 
-  // TODO: Fetch username from auth context/session
-  // In a real app, you'd fetch the username from your auth context or session
-  // For now, using default "nadil" as shown in the image
-
-<<<<<<< Updated upstream
-  const handleLogout = () => {
-    // TODO: Implement logout logic
-    router.push("/login");
-  };
-
-  const menuItems = [
-    {
-      id: "continue",
-      icon: faPlay,
-      title: "Continue",
-      description: "Pick up where you left off.",
-      href: "/game",
-    },
-=======
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
   };
@@ -59,7 +29,6 @@ export default function MainMenuPage() {
     dispatch(logout());
     router.push("/login");
   };
-
   const handleLogoutCancel = () => {
     setShowLogoutModal(false);
   };
@@ -89,7 +58,6 @@ export default function MainMenuPage() {
     isLink: boolean;
     onClick?: () => void;
   }> = [
->>>>>>> Stashed changes
     {
       id: "new-game",
       icon: faPlus,
@@ -119,7 +87,7 @@ export default function MainMenuPage() {
 
   return (
     <Navigation
-      username={username}
+      username={user.username}
       showUserInfo={true}
       onLogout={handleLogoutClick}
       showFooterLinks={false}
@@ -151,13 +119,8 @@ export default function MainMenuPage() {
             <p className="text-lg text-white">
               Welcome back,
             </p>
-<<<<<<< Updated upstream
-            <p className="text-xl font-bold text-white">
-              {username}!
-=======
             <p className="text-xl font-bold text-white animate-pulse">
               {user.username}!
->>>>>>> Stashed changes
             </p>
           </div>
 
