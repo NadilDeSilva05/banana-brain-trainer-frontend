@@ -15,12 +15,12 @@ export default function Button({
   className = "",
   ...props
 }: ButtonProps) {
-  const baseStyles = "rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2";
+  const baseStyles = "rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 transform hover:scale-105 active:scale-95";
   
   const variantStyles = {
-    primary: "bg-primary text-black hover:bg-primary-hover hover:shadow-lg hover:shadow-primary/50",
-    secondary: "bg-white/5 text-white border-2 border-white/10 backdrop-blur-sm hover:border-white/20 hover:bg-white/10",
-    outline: "border-2 border-primary text-primary bg-transparent hover:bg-primary hover:text-black",
+    primary: "bg-primary text-black hover:bg-primary-hover hover:shadow-lg hover:shadow-primary/50 animate-glow",
+    secondary: "bg-white/5 text-white border-2 border-white/10 backdrop-blur-sm hover:border-white/20 hover:bg-white/10 hover:shadow-lg",
+    outline: "border-2 border-primary text-primary bg-transparent hover:bg-primary hover:text-black hover:shadow-lg",
   };
 
   const widthStyles = fullWidth ? "w-full" : "";

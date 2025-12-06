@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrophy, faHome } from "@fortawesome/free-solid-svg-icons";
-import FloatingBananas from "@/components/FloatingBananas";
 import Navigation from "@/components/Navigation";
+import LogoutConfirmationModal from "@/components/LogoutConfirmationModal";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -19,6 +19,7 @@ export default function LeaderboardPage() {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -44,7 +45,7 @@ export default function LeaderboardPage() {
         } else {
           setError(response.error || "Failed to load leaderboard");
         }
-      } catch (err) {
+      } catch {
         setError("An error occurred while loading the leaderboard");
       } finally {
         setLoading(false);
@@ -56,20 +57,37 @@ export default function LeaderboardPage() {
     }
   }, [isAuthenticated]);
 
-  const handleLogout = () => {
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleLogoutConfirm = () => {
     dispatch(logout());
     router.push("/login");
   };
 
+  const handleLogoutCancel = () => {
+    setShowLogoutModal(false);
+  };
+
   if (authLoading || !user) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#1A2B27]">
+      <div 
+        className="flex h-screen items-center justify-center"
+        style={{
+          backgroundImage: "url('/assets/images/background-image.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
         <div className="text-white">Loading...</div>
       </div>
     );
   }
 
-  const getTrophyIcon = (rank: number) => {
+  const getTrophyIcon = (rank: number | undefined) => {
+    if (!rank) return null;
     switch (rank) {
       case 1:
         return { icon: faTrophy, color: "text-yellow-400" }; // Gold
@@ -86,18 +104,25 @@ export default function LeaderboardPage() {
     <Navigation
       username={user.username}
       showUserInfo={true}
-      onLogout={handleLogout}
+      onLogout={handleLogoutClick}
       showFooterLinks={true}
       copyrightYear="2023"
       backgroundClassName="bg-[#1A2B27]"
     >
-      <FloatingBananas />
-
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: "url('/assets/images/background-image.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
       {/* Main Content */}
       <main className="relative z-10 flex flex-1 flex-col items-center px-4 py-6">
         <div className="w-full max-w-2xl flex flex-col h-full">
           {/* Title */}
-          <div className="text-center space-y-2 mb-4 shrink-0">
+          <div className="text-center space-y-2 mb-4 shrink-0 animate-slide-in-down">
             <h1 className="text-3xl font-bold text-white sm:text-4xl">Leaderboard</h1>
             <p className="text-white text-sm sm:text-base">See who&apos;s top banana!</p>
           </div>
@@ -122,17 +147,20 @@ export default function LeaderboardPage() {
                   No leaderboard data available yet. Be the first to play!
                 </div>
               ) : (
-                leaderboardData.map((entry) => {
+                leaderboardData.map((entry, index) => {
               const trophy = getTrophyIcon(entry.rank);
+              const delayIndex = typeof index === 'number' ? index : 0;
+              const delay = `${100 + Math.min(delayIndex, 5) * 50}ms`;
               return (
                 <div
                   key={entry.rank}
-                  className="rounded-xl bg-[#223632] px-4 py-4 flex items-center gap-4 border-2 border-[#4CAF50]/20 hover:border-[#4CAF50]/40 transition-colors shrink-0"
+                  className="rounded-xl bg-[#223632] px-4 py-4 flex items-center gap-4 border-2 border-[#4CAF50]/20 hover:border-[#4CAF50]/40 transition-all duration-300 shrink-0 transform hover:scale-105 hover:shadow-lg animate-slide-in-left"
+                  style={{ animationDelay: delay }}
                 >
                   {/* Trophy Icon or Rank */}
                   <div className="shrink-0">
                     {trophy ? (
-                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#1A2B27]">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#1A2B27] animate-bounce">
                         <FontAwesomeIcon
                           icon={trophy.icon}
                           className={`${trophy.color} text-2xl`}
@@ -164,10 +192,10 @@ export default function LeaderboardPage() {
           )}
 
           {/* Back to Home Button */}
-          <div className="flex justify-center pt-2 shrink-0">
+          <div className="flex justify-center pt-2 shrink-0 animate-slide-in-up" style={{ animationDelay: '0.5s' }}>
             <Link
               href="/main-menu"
-              className="flex items-center gap-3 rounded-xl bg-[#4CAF50] px-8 py-4 text-white font-semibold text-base hover:bg-[#3bc66f] transition-colors"
+              className="flex items-center gap-3 rounded-xl bg-[#4CAF50] px-8 py-4 text-white font-semibold text-base hover:bg-[#3bc66f] transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-primary/50"
             >
               <FontAwesomeIcon icon={faHome} className="text-lg" />
               <span>Back to Home</span>
@@ -175,6 +203,13 @@ export default function LeaderboardPage() {
           </div>
         </div>
       </main>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmationModal
+        isOpen={showLogoutModal}
+        onConfirm={handleLogoutConfirm}
+        onCancel={handleLogoutCancel}
+      />
     </Navigation>
   );
 }
