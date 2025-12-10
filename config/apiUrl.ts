@@ -19,6 +19,7 @@ export const API_URL = {
     SESSION: '/game/session',
     SESSIONS: '/game/sessions',
     STATS: '/game/stats',
+    EMOJI: '/game/emoji',
   },
   
   // Leaderboard endpoints

@@ -12,6 +12,13 @@ export interface PuzzleResponse {
   solution: number;
 }
 
+export interface EmojiResponse {
+  emoji: string;
+  name: string;
+  category: string;
+  unicode: string;
+}
+
 export const gameService = {
   /**
    * Get a new puzzle from Banana API
@@ -51,6 +58,13 @@ export const gameService = {
    */
   getStats: async (): Promise<ApiResponse<GameStats>> => {
     return httpGet<GameStats>(API_URL.GAME.STATS);
+  },
+
+  /**
+   * Get a random emoji from EmojiHub API
+   */
+  getEmoji: async (): Promise<ApiResponse<EmojiResponse>> => {
+    return httpGet<EmojiResponse>(API_URL.GAME.EMOJI);
   },
 };
 
