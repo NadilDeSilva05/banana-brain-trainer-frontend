@@ -12,6 +12,8 @@ import BackButton from "@/components/BackButton";
 import GameModal from "@/components/GameModal";
 import GameOverModal from "@/components/GameOverModal";
 import LogoutConfirmationModal from "@/components/LogoutConfirmationModal";
+import EmojiBanana from "@/components/EmojiBanana";
+import PlayerMood from "@/components/PlayerMood";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -47,7 +49,10 @@ export default function NewGamePage() {
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
   const [answers, setAnswers] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+  const [playerMood, setPlayerMood] = useState<string>('focused');
+  const [emojiBananas, setEmojiBananas] = useState<Array<{ id: string; emoji: string; position: { x: number; y: number } }>>([]);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const emojiBananaIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -80,7 +85,7 @@ export default function NewGamePage() {
     
     try {
       const response = await gameService.getPuzzle(true); // Get base64 image
-      if (response.success && response.data) {
+      if (response.success && response.data && response.data.solution !== undefined) {
         const puzzle: Puzzle = {
           solution: response.data.solution,
           image: response.data.image,
@@ -89,8 +94,8 @@ export default function NewGamePage() {
         const answerOptions = generateAnswers(puzzle.solution);
         setAnswers(answerOptions);
       } else {
-        console.error('Failed to fetch puzzle:', response.error);
         // Fallback to random puzzle if API fails
+        console.warn('Puzzle API returned invalid response, using fallback puzzle');
         const randomSolution = Math.floor(Math.random() * 20) + 1;
         const puzzle: Puzzle = { solution: randomSolution };
         setCurrentPuzzle(puzzle);
@@ -98,8 +103,8 @@ export default function NewGamePage() {
         setAnswers(answerOptions);
       }
     } catch (err) {
-      console.error('Error fetching puzzle:', err);
-      // Fallback to random puzzle on error
+      // Fallback to random puzzle on error - don't log as error since we have fallback
+      console.warn('Puzzle fetch failed, using fallback puzzle:', err instanceof Error ? err.message : 'Unknown error');
       const randomSolution = Math.floor(Math.random() * 20) + 1;
       const puzzle: Puzzle = { solution: randomSolution };
       setCurrentPuzzle(puzzle);
@@ -164,6 +169,12 @@ export default function NewGamePage() {
     if (timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current);
     }
+    if (emojiBananaIntervalRef.current) {
+      clearInterval(emojiBananaIntervalRef.current);
+    }
+
+    // Change mood to thinking/surprised
+    setPlayerMood('thinking');
 
     // Save game session
     await saveGameSession();
@@ -175,6 +186,70 @@ export default function NewGamePage() {
     setShowGameOver(true);
   }, [isGameActive, showGameOver, score, saveGameSession, checkHighScore]);
 
+  // Spawn emoji bananas randomly
+  const spawnEmojiBanana = useCallback(async () => {
+    if (!isGameActive || showGameOver || showBackModal) return;
+    
+    try {
+      const response = await gameService.getEmoji();
+      if (response.success && response.data?.emoji) {
+        const id = `emoji-${Date.now()}-${Math.random()}`;
+        const x = Math.random() * 70 + 15; // Random x position (15-85%)
+        const y = Math.random() * 50 + 25; // Random y position (25-75%)
+        
+        setEmojiBananas(prev => [...prev, {
+          id,
+          emoji: response.data!.emoji,
+          position: { x, y },
+        }]);
+        
+        // Remove emoji banana after 10 seconds if not collected
+        setTimeout(() => {
+          setEmojiBananas(prev => prev.filter(b => b.id !== id));
+        }, 10000);
+      }
+    } catch (error) {
+      console.error('Error fetching emoji:', error);
+    }
+  }, [isGameActive, showGameOver, showBackModal]);
+
+  // Handle emoji banana collection
+  const handleEmojiCollect = useCallback(() => {
+    setPlayerMood('happy');
+    setTimeout(() => setPlayerMood('focused'), 1500);
+    
+    // Add bonus points for collecting emoji
+    setScore(prev => prev + 5);
+  }, []);
+
+  // Spawn emoji bananas periodically
+  useEffect(() => {
+    if (!isGameActive || showGameOver || showBackModal) {
+      if (emojiBananaIntervalRef.current) {
+        clearInterval(emojiBananaIntervalRef.current);
+        emojiBananaIntervalRef.current = null;
+      }
+      return;
+    }
+
+    // Initial spawn after 5 seconds
+    const initialTimeout = setTimeout(() => {
+      spawnEmojiBanana();
+    }, 5000);
+
+    // Spawn every 12-20 seconds
+    emojiBananaIntervalRef.current = setInterval(() => {
+      spawnEmojiBanana();
+    }, 12000 + Math.random() * 8000);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      if (emojiBananaIntervalRef.current) {
+        clearInterval(emojiBananaIntervalRef.current);
+      }
+    };
+  }, [isGameActive, showGameOver, showBackModal, spawnEmojiBanana]);
+
   // Fetch puzzle on component mount
   useEffect(() => {
     if (isAuthenticated) {
@@ -182,6 +257,7 @@ export default function NewGamePage() {
       // Initialize timer and questions for level 1
       setTimer(getTimerForLevel(1));
       setQuestionsInLevel(getQuestionsForLevel(1));
+      setPlayerMood('focused');
     }
   }, [isAuthenticated, fetchPuzzle]);
 
@@ -237,6 +313,10 @@ export default function NewGamePage() {
       setScoreAnimation(true);
       setTimeout(() => setScoreAnimation(false), 500);
       
+      // Change mood to happy/excited
+      setPlayerMood('celebrating');
+      setTimeout(() => setPlayerMood('happy'), 2000);
+      
       setScore(prev => prev + 10);
       const newStreak = streak + 1;
       setStreak(newStreak);
@@ -251,6 +331,8 @@ export default function NewGamePage() {
         setTimeout(() => setLevelAnimation(false), 800);
         newLevel = level + 1;
         setLevel(newLevel);
+        setPlayerMood('excited');
+        setTimeout(() => setPlayerMood('confident'), 2000);
       }
       
       // Load new puzzle after short delay
@@ -260,11 +342,15 @@ export default function NewGamePage() {
           // Use newLevel to get the correct timer for the current/new level
           const newTimer = getTimerForLevel(newLevel);
           setTimer(newTimer);
+          setPlayerMood('focused');
         }
       }, 500);
     } else {
-      // Wrong answer - game over
-      handleGameOver();
+      // Wrong answer - change mood to surprised then game over
+      setPlayerMood('surprised');
+      setTimeout(() => {
+        handleGameOver();
+      }, 500);
     }
     
     // Reset answer
@@ -297,6 +383,8 @@ export default function NewGamePage() {
     setSelectedAnswer(null);
     setIsGameActive(true);
     setIsHighScore(false);
+    setPlayerMood('focused');
+    setEmojiBananas([]);
     fetchPuzzle();
   };
 
@@ -312,6 +400,8 @@ export default function NewGamePage() {
     setSelectedAnswer(null);
     setIsGameActive(true);
     setIsHighScore(false);
+    setPlayerMood('focused');
+    setEmojiBananas([]);
     fetchPuzzle();
   };
 
@@ -404,10 +494,14 @@ export default function NewGamePage() {
 
         {/* Profile with Menu - Right */}
         <div className="relative menu-container flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#4CAF50]">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#4CAF50] relative">
             <span className="text-white font-bold text-lg">
               {user?.username.charAt(0).toUpperCase() || 'U'}
             </span>
+            {/* Player Mood Indicator */}
+            <div className="absolute -top-1 -right-1 bg-[#223632] rounded-full p-1 border border-[#4CAF50]">
+              <PlayerMood mood={playerMood} size="sm" />
+            </div>
           </div>
           <span className="text-white font-medium text-sm">{user?.username || 'User'}</span>
           <button
@@ -482,6 +576,37 @@ export default function NewGamePage() {
           <span className="text-white text-lg font-bold">{timer}</span>
           <span className="text-white text-xs">s</span>
         </div>
+      </div>
+
+      {/* Emoji Bananas - Floating collectibles */}
+      {emojiBananas.map((banana) => (
+        <EmojiBanana
+          key={banana.id}
+          emoji={banana.emoji}
+          position={banana.position}
+          onCollect={() => {
+            handleEmojiCollect();
+            setEmojiBananas(prev => prev.filter(b => b.id !== banana.id));
+          }}
+        />
+      ))}
+
+      {/* Emojified Enemies/Visual Elements - Floating emojis in background */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={`enemy-${i}`}
+            className="absolute text-4xl opacity-20 animate-float"
+            style={{
+              left: `${15 + i * 20}%`,
+              top: `${10 + (i % 3) * 30}%`,
+              animationDelay: `${i * 0.5}s`,
+              animationDuration: `${3 + i * 0.5}s`,
+            }}
+          >
+            {['👾', '👹', '👻', '🤖', '👽'][i]}
+          </div>
+        ))}
       </div>
 
       {/* Main Content */}

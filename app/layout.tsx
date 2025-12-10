@@ -4,6 +4,7 @@ import "./globals.css";
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import ReduxProvider from '@/providers/ReduxProvider'
+import BackgroundMusic from '@/components/BackgroundMusic'
 config.autoAddCss = false
 
 
@@ -33,6 +34,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ReduxProvider>
+          <BackgroundMusic />
           {children}
         </ReduxProvider>
       </body>
